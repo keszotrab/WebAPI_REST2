@@ -2,6 +2,8 @@
 using ApplicationCore.Interfaces.Repository;
 using ApplicationCore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using WebAPI.Dto;
 
 namespace WebAPI.Controllers
 {
@@ -14,9 +16,34 @@ namespace WebAPI.Controllers
             _service = service;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        [Route("{id}")]
+        public ActionResult<QuizDto> FindById(int id)
         {
-            return View();
+            var item = QuizDto.of(_service.FindQuizById(id));
+
+            return item == null ? NotFound() : Ok(item);
+        }
+
+        [HttpGet]
+        public IEnumerable<QuizDto> FindAll()
+        {
+            List<QuizDto> AllQuizzesDto= new List<QuizDto>();
+            IEnumerable<Quiz> allQuizes = _service.FindAllQuizzes();
+            foreach (var item in allQuizes)
+            {
+                AllQuizzesDto.Add(QuizDto.of(item));
+            }
+
+            return AllQuizzesDto;
+        }
+
+        [HttpPost]
+        [Route("{quizId}/items/{itemId}")]
+        public void SaveAnswer([FromBody] QuizItemAnswerDto dto, int quizId, int itemId )
+        {
+            _service.SaveUserAnswerForQuiz(quizId, dto.UserId, itemId, dto.Answer);
+            
         }
     }
 }

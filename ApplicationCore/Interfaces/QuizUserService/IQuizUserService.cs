@@ -14,7 +14,7 @@ public interface IQuizUserService
 
 
     //
-    IEnumerable<Quiz> FindAllQuizzes();
+    public IEnumerable<Quiz> FindAllQuizzes();
     //
 
 
